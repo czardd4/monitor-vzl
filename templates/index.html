@@ -2,41 +2,96 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Monitor VZLA Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor Divisas Venezuela</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #0b0e11; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #1e2329; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; width: 350px; border: 1px solid #333; }
-        h1 { color: #f0b90b; font-size: 1.2rem; margin-bottom: 20px; text-transform: uppercase; }
-        .box { background: #2b3139; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #474d57; }
-        .label { font-size: 0.75rem; color: #929aa5; display: block; margin-bottom: 5px; }
-        .value { font-size: 2rem; font-weight: bold; color: #ffffff; }
-        .status { font-size: 0.65rem; color: #02c076; margin-top: 10px; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h1>Monitor Real-Time</h1>
-        <div class="box">
-            <span class="label">Promedio USDT P2P (10 Órdenes)</span>
-            <div id="p2p-val" class="value">...</div>
-        </div>
-        <div class="box">
-            <span class="label">Dólar BCV Oficial</span>
-            <div id="bcv-val" class="value">...</div>
-        </div>
-        <div class="status">● Actualización automática cada 30 segundos</div>
-    </div>
-    <script>
-        async function updatePrices() {
-            try {
-                const res = await fetch('/api/precios');
-                const data = await res.json();
-                document.getElementById('p2p-val').innerText = data.binance + " Bs";
-                document.getElementById('bcv-val').innerText = data.bcv + " Bs";
-            } catch (e) { console.error("Error cargando precios"); }
+        /* Estilos generales inspirados en interfaces de Trading */
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0b0e11; /* Fondo oscuro tipo Binance */
+            color: #eaecef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-        updatePrices();
-        setInterval(updatePrices, 30000);
-    </script>
-</body>
-</html>
+
+        .card {
+            background-color: #1e2329;
+            padding: 2.5rem;
+            border-radius: 24px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            width: 360px;
+            border: 1px solid #333;
+        }
+
+        h1 {
+            color: #f0b90b; /* Amarillo Binance */
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+        }
+
+        .price-container {
+            background: #2b3139;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #474d57;
+            transition: all 0.3s ease;
+        }
+
+        .price-container:hover {
+            border-color: #f0b90b;
+            transform: translateY(-3px);
+        }
+
+        .label {
+            font-size: 0.8rem;
+            color: #929aa5;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            display: inline-block;
+        }
+
+        .currency {
+            font-size: 1rem;
+            color: #f0b90b;
+            margin-left: 5px;
+        }
+
+        .status-bar {
+            margin-top: 25px;
+            font-size: 0.75rem;
+            color: #02c076; /* Verde éxito */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Animación del punto de actualización */
+        .dot {
+            height: 8px;
+            width: 8px;
+            background-color: #02c076;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1);
