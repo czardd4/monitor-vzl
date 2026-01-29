@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Divisas VZLA</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0b0e11; color: #eaecef; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background-color: #1e2329; padding: 2.5rem; border-radius: 20px; box-shadow: 0 12px 40px rgba(0,0,0,0.6); text-align: center; width: 350px; border: 1px solid #333; }
+        h1 { color: #f0b90b; font-size: 1.5rem; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 1px; }
+        .box { background: #2b3139; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #474d57; transition: transform 0.3s; }
+        .box:hover { transform: translateY(-5px); border-color: #f0b90b; }
+        .label { font-size: 0.85rem; color: #929aa5; margin-bottom: 8px; display: block; }
+        .value { font-size: 2rem; font-weight: bold; color: #ffffff; }
+        .update-tag { font-size: 0.7rem; color: #02c076; margin-top: 15px; display: block; }
+        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #f0b90b; border-radius: 50%; width: 12px; height: 12px; display: inline-block; animation: spin 1s linear infinite; margin-right: 5px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Monitor Real-Time</h1>
+        
+        <div class="box">
+            <span class="label">USDT / USDC (Binance)</span>
+            <div id="binance-val" class="value">...</div>
+        </div>
+
+        <div class="box">
+            <span class="label">BCV Dólar Oficial</span>
+            <div id="bcv-val" class="value">...</div>
+        </div>
+
+        <span class="update-tag"><div class="loader"></div> Actualizando cada 30s</span>
+    </div>
+
+    <script>
+        async function fetchPrices() {
+            try {
+                const res = await fetch('/api/precios');
+                const data = await res.json();
+                document.getElementById('binance-val').textContent = data.binance;
+                document.getElementById('bcv-val').textContent = data.bcv + " Bs";
+            } catch (e) {
+                console.error("Error al obtener datos");
+            }
+        }
+
+        // Carga inicial
+        fetchPrices();
+        // Ciclo de actualización
+        setInterval(fetchPrices, 30000);
+    </script>
+</body>
+</html>
