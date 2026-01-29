@@ -2,41 +2,41 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Monitor USDT P2P vs BCV</title>
+    <title>Monitor VZLA Pro</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #0b0e11; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #1e2329; padding: 2.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; width: 350px; border: 1px solid #333; }
-        h1 { color: #f0b90b; font-size: 1.4rem; margin-bottom: 25px; letter-spacing: 1px; }
-        .box { background: #2b3139; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #474d57; }
-        .label { font-size: 0.85rem; color: #929aa5; display: block; margin-bottom: 8px; }
-        .value { font-size: 2.1rem; font-weight: bold; color: #ffffff; }
-        .status { font-size: 0.7rem; color: #02c076; margin-top: 15px; font-style: italic; }
+        .card { background: #1e2329; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; width: 350px; border: 1px solid #333; }
+        h1 { color: #f0b90b; font-size: 1.2rem; margin-bottom: 20px; text-transform: uppercase; }
+        .box { background: #2b3139; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #474d57; }
+        .label { font-size: 0.75rem; color: #929aa5; display: block; margin-bottom: 5px; }
+        .value { font-size: 2rem; font-weight: bold; color: #ffffff; }
+        .status { font-size: 0.65rem; color: #02c076; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h1>MONITOR VENEZUELA</h1>
+        <h1>Monitor Real-Time</h1>
         <div class="box">
-            <span class="label">Promedio P2P (Top 10 USDT)</span>
+            <span class="label">Promedio USDT P2P (10 Órdenes)</span>
             <div id="p2p-val" class="value">...</div>
         </div>
         <div class="box">
-            <span class="label">Dólar Oficial (BCV)</span>
+            <span class="label">Dólar BCV Oficial</span>
             <div id="bcv-val" class="value">...</div>
         </div>
-        <div class="status">● Actualización automática cada 30s</div>
+        <div class="status">● Actualización automática cada 30 segundos</div>
     </div>
     <script>
-        async function update() {
+        async function updatePrices() {
             try {
                 const res = await fetch('/api/precios');
                 const data = await res.json();
                 document.getElementById('p2p-val').innerText = data.binance + " Bs";
                 document.getElementById('bcv-val').innerText = data.bcv + " Bs";
-            } catch { console.error("Error"); }
+            } catch (e) { console.error("Error cargando precios"); }
         }
-        update();
-        setInterval(update, 30000);
+        updatePrices();
+        setInterval(updatePrices, 30000);
     </script>
 </body>
 </html>
