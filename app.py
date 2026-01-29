@@ -4,16 +4,24 @@ import requests
 app = Flask(__name__)
 
 def get_bcv_price():
-    try:
-        # Usamos la API de el_it_venezolano que es muy estable para Render
-        url = "https://pydolarvenezuela-api.vercel.app/api/v1/dollar?page=bcv"
-        response = requests.get(url, timeout=10)
-        data = response.json()
-        # Accedemos directamente al valor del precio
-        return data['monedas']['bcv']['price']
-    except Exception as e:
-        print(f"Error BCV: {e}")
-        return "N/A"
+    # Intentamos con la API más estable para servidores internacionales
+    urls = [
+        "https://pydolarvenezuela-api.vercel.app/api/v1/dollar?page=bcv",
+        "https://ve.dolarapi.com/v1/dolares/oficial"
+    ]
+    
+    for url in urls:
+        try:
+            response = requests.get(url, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                # Dependiendo de qué API responda, extraemos el dato
+                if 'monedas' in data:
+                    return data['monedas']['bcv']['price']
+                return data.get('promedio', 'N/A')
+        except:
+            continue
+    return "N/A"
 
 def get_binance_p2p():
     try:
@@ -26,21 +34,21 @@ def get_binance_p2p():
             "rows": 10,
             "publisherType": None,
             "tradeType": "BUY",
-            "transAmount": "500" # Filtramos por un monto mínimo para evitar órdenes 'basura'
+            "transAmount": "500" # FILTRO CLAVE: Montos reales de mercado
         }
         headers = { "User-Agent": "Mozilla/5.0" }
         
         response = requests.post(url, json=payload, headers=headers, timeout=10)
         data = response.json()
         
-        if data['success'] and data['data']:
-            # Solo promediamos si el precio es razonable (evitamos errores de API)
+        if data.get('success') and data.get('data'):
+            # Extraemos precios de órdenes reales (no anuncios basura)
             precios = [float(adv['adv']['price']) for adv in data['data']]
             promedio = sum(precios) / len(precios)
             return round(promedio, 2)
-        return "N/A"
     except:
-        return "Error"
+        pass
+    return "Error"
 
 @app.route('/')
 def index():
