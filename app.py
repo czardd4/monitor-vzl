@@ -5,18 +5,19 @@ app = Flask(__name__)
 
 def get_bcv_price():
     try:
-        # Usamos la API más estable para el dólar oficial en Render
-        response = requests.get("https://ve.dolarapi.com/v1/dolares/oficial", timeout=10)
-        if response.status_code == 200:
-            return response.json().get('promedio', 'Error')
-        return "Error API"
+        # Usamos la API de el_it_venezolano que es muy estable para Render
+        url = "https://pydolarvenezuela-api.vercel.app/api/v1/dollar?page=bcv"
+        response = requests.get(url, timeout=10)
+        data = response.json()
+        # Accedemos directamente al valor del precio
+        return data['monedas']['bcv']['price']
     except Exception as e:
-        return "Error Conexión"
+        print(f"Error BCV: {e}")
+        return "N/A"
 
-def get_binance_p2p_avg():
+def get_binance_p2p():
     try:
         url = "https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search"
-        # Payload específico para USDT en Bolívares
         payload = {
             "asset": "USDT",
             "fiat": "VES",
@@ -24,22 +25,22 @@ def get_binance_p2p_avg():
             "page": 1,
             "rows": 10,
             "publisherType": None,
-            "tradeType": "BUY"
+            "tradeType": "BUY",
+            "transAmount": "500" # Filtramos por un monto mínimo para evitar órdenes 'basura'
         }
-        # Headers para que Binance no nos bloquee
         headers = { "User-Agent": "Mozilla/5.0" }
         
         response = requests.post(url, json=payload, headers=headers, timeout=10)
         data = response.json()
         
-        if data.get('success') and data.get('data'):
-            # Sacamos el promedio de los primeros 10
-            prices = [float(adv['adv']['price']) for adv in data['data']]
-            avg = sum(prices) / len(prices)
-            return round(avg, 2)
+        if data['success'] and data['data']:
+            # Solo promediamos si el precio es razonable (evitamos errores de API)
+            precios = [float(adv['adv']['price']) for adv in data['data']]
+            promedio = sum(precios) / len(precios)
+            return round(promedio, 2)
         return "N/A"
     except:
-        return "Error P2P"
+        return "Error"
 
 @app.route('/')
 def index():
@@ -48,7 +49,7 @@ def index():
 @app.route('/api/precios')
 def api_precios():
     return jsonify({
-        'binance': get_binance_p2p_avg(),
+        'binance': get_binance_p2p(),
         'bcv': get_bcv_price()
     })
 
