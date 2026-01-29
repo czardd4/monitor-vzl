@@ -94,4 +94,66 @@
         @keyframes pulse {
             0% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.4; transform: scale(1.2); }
-            100% { opacity: 1; transform: scale(1);
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Responsivo para móviles */
+        @media (max-width: 400px) {
+            .card { width: 85%; padding: 1.5rem; }
+            .value { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>Monitor Venezuela</h1>
+
+        <div class="price-container">
+            <span class="label">PROMEDIO USDT P2P (Top 10)</span>
+            <div class="value" id="p2p-val">...</div>
+            <span class="currency">Bs</span>
+        </div>
+
+        <div class="price-container">
+            <span class="label">DÓLAR OFICIAL (BCV)</span>
+            <div class="value" id="bcv-val">...</div>
+            <span class="currency">Bs</span>
+        </div>
+
+        <div class="status-bar">
+            <span class="dot"></span>
+            Actualizando en tiempo real (30s)
+        </div>
+    </div>
+
+    <script>
+        // Función principal para obtener datos de tu API en Render
+        async function fetchPrices() {
+            try {
+                // Llamamos a la ruta /api/precios de tu app.py
+                const response = await fetch('/api/precios');
+                const data = await response.json();
+
+                // Actualizamos los valores en el HTML
+                // data.binance y data.bcv vienen de las llaves en el JSON de Python
+                document.getElementById('p2p-val').innerText = data.binance;
+                document.getElementById('bcv-val').innerText = data.bcv;
+
+                console.log("Precios actualizados correctamente");
+            } catch (error) {
+                console.error("Error al conectar con el servidor:", error);
+                document.getElementById('p2p-val').innerText = "Error";
+                document.getElementById('bcv-val').innerText = "Error";
+            }
+        }
+
+        // Ejecutar apenas cargue la página
+        fetchPrices();
+
+        // Configurar el intervalo de 30 segundos (30000 milisegundos)
+        setInterval(fetchPrices, 30000);
+    </script>
+
+</body>
+</html>
